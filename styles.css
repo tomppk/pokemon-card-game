@@ -1,9 +1,37 @@
+/* Setting width/height includes content and border */
+* {
+    box-sizing: border-box;
+}
+
+/* Board container to hold all cards */
+.board {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100vw; /* width 90% of view width */
+    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.row {
+    max-width: 1000px;
+    width: 80%;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
 
 /* Holds all the elements and sets the size of the card */
-.maincontainer {
+.cardcontainer {
     position: relative;
-    width: 250px;
-    height: 320px;
+    width: 120px;
+    height: 190px;
+    /* width: 250px; 
+    height: 320px; */
 }
 
 /* Holds the front and back elements. Controls the transform action */
@@ -28,7 +56,7 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    background-visibility: hidden;
+    background: hidden;
     background: #ffc728;
     color: #333;
     text-align: center;
@@ -42,7 +70,7 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    background-visibility: hidden;
+    background: hidden;
     background: #6d67c9;
     color: #fff;
     text-align: center;
