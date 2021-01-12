@@ -12,10 +12,13 @@
     flex-wrap: wrap;
     width: 100vw; /* width 90% of view width */
     height: 100vh;
+    max-width: 100%;
+    max-height: 100%;
     overflow-x: hidden;
     overflow-y: hidden;
 }
 
+/* Row to hold five cards */
 .row {
     max-width: 1000px;
     width: 80%;
@@ -57,12 +60,19 @@
     width: 100%;
     height: 100%;
     background: hidden;
-    background: #ffc728;
+    background: #FFCB05;
     color: #333;
     text-align: center;
     border-radius: 20px;
     font-size: 18px;
     font-weight: 700;
+    /* border: solid 1px #000; */
+}
+
+.front img {
+    margin-top: 20px;
+    height: 100px;
+    width: 87px;
 }
 
 /* The back-facing side of the card */
@@ -71,7 +81,7 @@
     width: 100%;
     height: 100%;
     background: hidden;
-    background: #6d67c9;
+    background: #3564AD;
     color: #fff;
     text-align: center;
     border-radius: 20px;
