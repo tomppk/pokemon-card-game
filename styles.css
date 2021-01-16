@@ -89,3 +89,9 @@
     font-weight: 700;
     transform: rotateY(180deg);
 }
+
+.back img {
+    margin-top: 20px;
+    height: 100px;
+    width: 87px;
+}
