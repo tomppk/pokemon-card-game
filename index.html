@@ -9,208 +9,39 @@
 </head>
 
 <body>
-    <div class="board">
+    <nav id="navbar" class="hide">
+        <div id="score">Guesses: <span id="guesses">0</span></div>
+        <div id="restart">Restart</div>
+    </nav>
 
-        <section class="row">
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card
-                    </div>
-                    <div class="back">back of card
-                    </div>
-                </div>
+    <div id="startMenuContainer">
+        <h1>Pokemon Card Game</h1>
+        <form id="startMenuForm" autocomplete="off">
+            <div class="form-control">
+                <input type="text" name="playerName" required>
+                <label>Enter your name</label>
+
             </div>
 
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card
-                    </div>
-                    <div class="back">back of card
+            <div id="selectElement">
+                <label>Select Difficulty: </label>
 
-                    </div>
-                </div>
+                <select name="difficulty" id="difficulty">
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
             </div>
 
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card
-                    </div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card
-                    </div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card
-                    </div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-        </section>
-
-        <section class="row">
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card
-                    </div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-        </section>
-
-        <section class="row">
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-        </section>
-
-        <section class="row">
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- <section class="row">
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-
-            <div class="cardcontainer">
-                <div class="card">
-                    <div class="front">front of card</div>
-                    <div class="back">back of card</div>
-                </div>
-            </div>
-        </section> -->
-
-
-
+            <button id="newGameButton">Start a New Game</button>
+        </form>
     </div>
 
-    <script src="pokemon.js"></script>
+    <div class="board hide">
+
+
+
+        <script src="pokemon.js"></script>
 </body>
 
 </html>
