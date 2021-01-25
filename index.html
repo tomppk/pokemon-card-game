@@ -9,9 +9,20 @@
 </head>
 
 <body>
+    <div id="endMenu" class="hide">
+        <h1 id="endMenuName"></h1>
+        <p id="guessParagraph"></p>
+        <p id="timeParagraph"></p>
+        <button class="btn" id="endGameButton">Start a New Game</button>
+    </div>
+
+
+
+    <div id="overlay"></div>
     <nav id="navbar" class="hide">
         <div id="score">Guesses: <span id="guesses">0</span></div>
         <div id="restart">Restart</div>
+        <div class="clock"></div>
     </nav>
 
     <div id="startMenuContainer">
@@ -20,7 +31,6 @@
             <div class="form-control">
                 <input type="text" name="playerName" required>
                 <label>Enter your name</label>
-
             </div>
 
             <div id="selectElement">
@@ -33,7 +43,7 @@
                 </select>
             </div>
 
-            <button id="newGameButton">Start a New Game</button>
+            <button class="btn" id="newGameButton">Start a New Game</button>
         </form>
     </div>
 

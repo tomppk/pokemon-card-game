@@ -12,6 +12,36 @@ body {
 
 }
 
+#overlay {
+    position: fixed; /* Sit on top of the page content */
+    display: none; /* Hidden by default */
+    width: 100%; /* Full width (cover the whole page) */
+    height: 100%; /* Full height (cover the whole page) */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.6); /* Black background with opacity */
+    z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+    cursor: pointer; /* Add a pointer on hover */
+  }
+
+  #endMenu {
+      position: absolute;
+      z-index: 10;
+      height: 300px;
+      width: 300px;
+      margin: 0 auto;
+      top: 35%;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      background-color: rgba(70,130,180,0.9);
+    color: #fff;
+
+      border-radius: 10px;
+  }
+
 #startMenuContainer {
     background-color: steelblue;
     color: #fff;
@@ -71,7 +101,7 @@ body {
 
 }
 
-#newGameButton {
+.btn {
     cursor: pointer;
     display: inline-block;
     width: 100%;
@@ -83,11 +113,11 @@ body {
     border-radius: 5px;
 }
 
-#newGameButton:focus {
+.btn:focus {
     outline: none;
 }
 
-#newGameButton:active {
+.btn:active {
     transform: scale(0.98);
 }
 
@@ -96,7 +126,7 @@ body {
 }
 
 #navbar {
-    background-color: #333;
+    background-color: steelblue;
     overflow: hidden;
 }
   
@@ -115,25 +145,6 @@ body {
     color: black;
     cursor: pointer;
   }
-
-/* Scores div to show number of guesses */
-/* #navbar {
-    display: flex;
-    background-color: #3564AD;
-    color:#fff;
-    width: 100vw;
-    height: 25px;
-    position: fixed;
-    top: 0;
-    z-index: 5;
-    margin-bottom: 20px;
-    padding: 20px;
-    text-align: left;
-    justify-content: center;
-    align-content: center;
-    font-size: 16px;
-    font-weight: 700;
-} */
 
 #guesses {
     color:#fff;
@@ -163,29 +174,7 @@ body {
     justify-content: center;
 }
 
-/* Board container to hold all cards */
-/* .board {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-    flex-wrap: wrap;
-    width: 100vw;
-    height: 100vh;
-    max-width: 100%;
-    overflow-x: hidden;
-    overflow-y: hidden;
-} */
-
-/* Row to hold five cards */
-/* .row {
-    max-width: 1000px;
-    width: 80%;
-    margin-bottom: 20px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-} */
+/* CSS to flip cards below */
 
 /* Holds all the elements and sets the size of the card */
 .cardcontainer {

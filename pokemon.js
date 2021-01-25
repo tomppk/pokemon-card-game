@@ -8,9 +8,13 @@ const startMenuContainer = document.getElementById('startMenuContainer');
 const startMenuForm = document.getElementById('startMenuForm');
 const startNewGameButton = document.getElementById('newGameButton')
 const restartGame = document.getElementById('restart');
+const endGameButton = document.getElementById('endGameButton');
+const overlay = document.getElementById('overlay');
 
+// Selector for start menu form label
 const labels = document.querySelectorAll('.form-control label');
 
+// Animation for "Enter your name" input in start menu form
 labels.forEach(label => {
     label.innerHTML = label.innerText
         .split('')
@@ -24,10 +28,9 @@ startMenuForm.addEventListener('submit', (evt) => {
 })
 
 
-
-// Start new game by clicking button
+// Start new game by clicking start menu button
 startNewGameButton.addEventListener('click', () => {
-    // Select playername and difficulty data from form
+    // Select playername and difficulty inputs from start menu form
     let playerName = startMenuForm.elements.playerName.value;
     let selectedDifficulty = startMenuForm.elements.difficulty.value;
     initGame(selectedDifficulty);
@@ -41,18 +44,36 @@ restartGame.addEventListener('click', () => {
     navbar.classList.toggle('hide');
     board.classList.toggle('hide');
     startMenuForm.elements.playerName.value = '';
+    resetGameTime();
 })
 
+endGameButton.addEventListener('click', () => {
+    overlay.style.display = "none";
+    document.getElementById('endMenu').classList.toggle('hide');
+    board.innerHTML = '';
+    document.getElementById('guesses').innerText = 0;
+    startMenuContainer.classList.toggle('hide');
+    navbar.classList.toggle('hide');
+    board.classList.toggle('hide');
+    startMenuForm.elements.playerName.value = '';
+    resetGameTime();
+})
+
+// Object to handle game state. Keep track of order of pokemon array and playing card index on board.
 const gameState = {
     deckOfCards: null,
     openCardIndex: null,
-    guesses: 1
+    guesses: 0,
+    cardsOpen: 0
 }
 
+// Initialize new game.
 function initGame(difficulty) {
+    resetGameTime();
     gameState.deckOfCards = null;
     gameState.openCardIndex = null;
-    gameState.guesses = 1;
+    gameState.guesses = 0;
+    startGameTime();
     startMenuContainer.classList.toggle('hide');
     navbar.classList.toggle('hide');
     board.classList.toggle('hide');
@@ -69,8 +90,11 @@ function initGame(difficulty) {
     }
 }
 
+
+// Variable used to prevent turning cards during setTimeout. Can only turn two cards at one time
 let isRunning = false;
 
+// Function to turn cards and check for match
 function turnCard(cardID) {
     if (isRunning) {
         return;
@@ -82,11 +106,7 @@ function turnCard(cardID) {
 
     // Open first card
     if (gameState.openCardIndex === null) {
-        updateGuesses();
         gameState.openCardIndex = cardID;
-        console.log("First card turn")
-        console.log("clickedCard: ", clickedCard)
-        console.log("gameState.openCardIndex: ", gameState.openCardIndex)
         isRunning = false;
         return;
     }
@@ -95,19 +115,14 @@ function turnCard(cardID) {
 
     if (gameState.deckOfCards[cardID] === gameState.deckOfCards[gameState.openCardIndex]) {
         updateGuesses();
-
+        gameState.cardsOpen += 2;
+        if (gameState.cardsOpen === gameState.deckOfCards.length) {
+            gameFinished();
+        }
         gameState.openCardIndex = null;
-        console.log("Second card turn: match")
-        console.log("clickedCard: ", clickedCard)
-        console.log("previousCard: ", previousCard)
-        console.log("gameState.openCardIndex: ", gameState.openCardIndex)
         isRunning = false;
         return;
     }
-    console.log("Second Card Turn: No match")
-    console.log("previousCard: ", previousCard)
-    console.log("clickedCard: ", clickedCard)
-    console.log("gameState.openCardIndex: ", gameState.openCardIndex)
     updateGuesses();
 
     gameState.openCardIndex = null;
@@ -115,17 +130,24 @@ function turnCard(cardID) {
         clickedCard.classList.toggle("turn");
         previousCard.classList.toggle("turn");
         isRunning = false;
-
-        console.log("previousCard: ", previousCard)
-        console.log("clickedCard: ", clickedCard)
-        console.log("gameState.openCardIndex: ", gameState.openCardIndex)
     }, 1500)
 
 }
 
+// Function run when game is finished
+function gameFinished() {
+    stopGameTime();
+    overlay.style.display = "block";
+    document.getElementById('endMenuName').innerText = `Congratulations, ${startMenuForm.elements.playerName.value}!`;
+    document.getElementById('guessParagraph').innerText = `Number of guesses: ${gameState.guesses}`;
+    document.getElementById('timeParagraph').innerText = `Time it took to finish: ${displayClock.textContent}`;
+    document.getElementById('endMenu').classList.toggle('hide');
+}
+
+// Update number of guesses
 function updateGuesses() {
     let guessSpan = document.getElementById('guesses');
-    guessSpan.innerText = gameState.guesses++;
+    guessSpan.innerText = ++gameState.guesses;
 }
 
 // Game difficulties. How many pairs of pokemon.
@@ -135,7 +157,7 @@ const difficultyLevels = {
     hard: 30
 }
 
-// Create a deck
+// Create a deck of pokemon and shuffle pokemon deck
 function newDeck(numberOfPokemons) {
     const allPokemons = [];
     for (let i = 1; i < 153; i++) {
@@ -158,7 +180,7 @@ function shuffleArray(array) {
     }
 }
 
-// Draw cards on board
+// Draw card elements on board
 function drawCardsOnBoard(deckOfCards) {
     let i = 0;
     for (let pokemon of deckOfCards) {
@@ -177,7 +199,47 @@ function drawCardsOnBoard(deckOfCards) {
         i++;
     }
 }
+// Game Clock adapted from MDN setInterval tutorial
+// Define a counter variable for the number of seconds and set it to zero.
+let secondCount = 0;
+// Define a global to store the interval when it is active.
+let gameTime;
+// Store a reference to the display div element in a variable
+const displayClock = document.querySelector('.clock');
 
+// Function to calculate the current hours, minutes, and seconds, and display the count
+function displayCount() {
+    // Calculate current hours, minutes, and seconds
+    let hours = Math.floor(secondCount / 3600);
+    let minutes = Math.floor((secondCount % 3600) / 60);
+    let seconds = Math.floor(secondCount % 60)
 
+    // Display a leading zero if the values are less than ten
+    let displayHours = (hours < 10) ? '0' + hours : hours;
+    let displayMinutes = (minutes < 10) ? '0' + minutes : minutes;
+    let displaySeconds = (seconds < 10) ? '0' + seconds : seconds;
+
+    // Write the current stopwatch display time into the display paragraph
+    displayClock.textContent = displayHours + ':' + displayMinutes + ':' + displaySeconds;
+
+    // Increment the second counter by one
+    secondCount++;
+}
+
+function startGameTime() {
+    gameTime = setInterval(() => {
+        displayCount()
+    }, 1000);
+}
+
+function stopGameTime() {
+    clearInterval(gameTime);
+}
+
+function resetGameTime() {
+    clearInterval(gameTime);
+    secondCount = 0;
+    displayCount();
+}
 
 
