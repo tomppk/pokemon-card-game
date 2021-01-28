@@ -1,5 +1,6 @@
 // URL for pokemon images
 // https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png
+// https://github.com/PokeAPI/sprites/blob/master/sprites/pokemon/other/dream-world/1.svg
 
 // Selectors for DOM elements
 const board = document.querySelector('.board')
@@ -38,26 +39,27 @@ startNewGameButton.addEventListener('click', () => {
 
 // Restart game
 restartGame.addEventListener('click', () => {
-    board.innerHTML = '';
-    document.getElementById('guesses').innerText = 0;
-    startMenuContainer.classList.toggle('hide');
-    navbar.classList.toggle('hide');
-    board.classList.toggle('hide');
-    startMenuForm.elements.playerName.value = '';
-    resetGameTime();
+    resetGame();
 })
 
 endGameButton.addEventListener('click', () => {
     overlay.style.display = "none";
     document.getElementById('endMenu').classList.toggle('hide');
+    resetGame();
+})
+
+// Resets game and state
+function resetGame() {
     board.innerHTML = '';
     document.getElementById('guesses').innerText = 0;
     startMenuContainer.classList.toggle('hide');
     navbar.classList.toggle('hide');
     board.classList.toggle('hide');
     startMenuForm.elements.playerName.value = '';
+    startMenuForm.elements.difficulty.value = 'easy';
+    startMenuForm.elements.deck.value = 'standard';
     resetGameTime();
-})
+}
 
 // Object to handle game state. Keep track of order of pokemon array and playing card index on board.
 const gameState = {
@@ -79,7 +81,7 @@ function initGame(difficulty) {
     board.classList.toggle('hide');
     const numberOfPokemons = difficultyLevels[difficulty];
     gameState.deckOfCards = newDeck(numberOfPokemons);
-    drawCardsOnBoard(gameState.deckOfCards);
+    drawCardsOnBoard(gameState.deckOfCards, startMenuForm.elements.deck.value);
     const cards = document.querySelectorAll('.card');
 
     // Enable turning cards around by clicking
@@ -102,6 +104,9 @@ function turnCard(cardID) {
     isRunning = true;
 
     let clickedCard = document.getElementById(cardID);
+    console.log('clicedcard:', clickedCard.id)
+    console.log('gamestate:', gameState.openCardIndex)
+
     clickedCard.classList.toggle("turn");
 
     // Open first card
@@ -112,6 +117,9 @@ function turnCard(cardID) {
     }
     // Open second card. Save previous card ID. Compare ID's if match cards remain open. If no match cards are turned back around.
     let previousCard = document.getElementById(gameState.openCardIndex);
+
+    console.log('previouscard:', previousCard.id)
+
 
     if (gameState.deckOfCards[cardID] === gameState.deckOfCards[gameState.openCardIndex]) {
         updateGuesses();
@@ -160,7 +168,7 @@ const difficultyLevels = {
 // Create a deck of pokemon and shuffle pokemon deck
 function newDeck(numberOfPokemons) {
     const allPokemons = [];
-    for (let i = 1; i < 153; i++) {
+    for (let i = 1; i < 152; i++) {
         allPokemons.push(i);
     }
     shuffleArray(allPokemons);
@@ -180,8 +188,22 @@ function shuffleArray(array) {
     }
 }
 
+// Array of folder names for different pokemon artwork
+// const imageFolder = ['dream-world', 'official-artwork', 'standard'];
+
+// Pick random folder and artwork to use
+// function chooseImageFolder(arrayOfFolders) {
+//     const rand = Math.floor(Math.random() * 3);
+//     return arrayOfFolders[rand];
+// }
+
 // Draw card elements on board
-function drawCardsOnBoard(deckOfCards) {
+function drawCardsOnBoard(deckOfCards, deck) {
+    let fileExtension = 'png'
+    if (deck === 'dream-world') {
+        fileExtension = 'svg'
+    }
+
     let i = 0;
     for (let pokemon of deckOfCards) {
         const cardTemplate =
@@ -191,7 +213,7 @@ function drawCardsOnBoard(deckOfCards) {
             <div class="front">front of card
             <img src="pokemon_logo.svg"></div>
             <div class="back">back of card
-            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon}.png"></div>
+            <img src="./sprites/${deck}/${pokemon}.${fileExtension}"></div>
         </div>
     </div>
     </div>`

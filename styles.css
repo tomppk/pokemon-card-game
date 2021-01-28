@@ -59,6 +59,11 @@ body {
     font-size: 18px;
 }
 
+#selectDeck {
+    margin: 20px 0 40px;
+    font-size: 18px;
+}
+
 .form-control {
     position: relative;
     margin: 20px 0 40px;
