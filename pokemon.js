@@ -34,7 +34,8 @@ startNewGameButton.addEventListener('click', () => {
     // Select playername and difficulty inputs from start menu form
     let playerName = startMenuForm.elements.playerName.value;
     let selectedDifficulty = startMenuForm.elements.difficulty.value;
-    initGame(selectedDifficulty);
+    let deckArt = startMenuForm.elements.deck.value;
+    initGame(playerName, selectedDifficulty, deckArt);
 })
 
 // Restart game
@@ -62,29 +63,21 @@ function resetGame() {
 }
 
 // Object to handle game state. Keep track of order of pokemon array and playing card index on board.
-const gameState = {
-    deckOfCards: null,
-    openCardIndex: null,
-    guesses: 0,
-    cardsOpen: 0
-}
+let gameState = {};
 
 // Initialize new game.
-function initGame(difficulty) {
+function initGame(username, level, deckArt) {
     resetGameTime();
-    gameState.deckOfCards = null;
-    gameState.openCardIndex = null;
-    gameState.guesses = 0;
     startGameTime();
     startMenuContainer.classList.toggle('hide');
     navbar.classList.toggle('hide');
     board.classList.toggle('hide');
-    const numberOfPokemons = difficultyLevels[difficulty];
-    gameState.deckOfCards = newDeck(numberOfPokemons);
-    drawCardsOnBoard(gameState.deckOfCards, startMenuForm.elements.deck.value);
-    const cards = document.querySelectorAll('.card');
+    gameState = getNewGame(username, level, deckArt);
+    drawCardsOnBoard(gameState.cards);
+    drawCardFaces(gameState.cards, gameState.cardStyle)
 
     // Enable turning cards around by clicking
+    const cards = document.querySelectorAll('.card');
     for (let card of cards) {
         card.addEventListener('click', () => {
             turnCard(card.id);
@@ -97,46 +90,18 @@ function initGame(difficulty) {
 let isRunning = false;
 
 // Function to turn cards and check for match
-function turnCard(cardID) {
+function turnCard(cardId) {
     if (isRunning) {
         return;
     }
     isRunning = true;
 
-    let clickedCard = document.getElementById(cardID);
-    console.log('clicedcard:', clickedCard.id)
-    console.log('gamestate:', gameState.openCardIndex)
+    gameState.cards[cardId] = getCard(gameState.id, cardId);
+    drawCardFaces(gameState.cards, gameState.cardStyle);
 
-    clickedCard.classList.toggle("turn");
-
-    // Open first card
-    if (gameState.openCardIndex === null) {
-        gameState.openCardIndex = cardID;
-        isRunning = false;
-        return;
-    }
-    // Open second card. Save previous card ID. Compare ID's if match cards remain open. If no match cards are turned back around.
-    let previousCard = document.getElementById(gameState.openCardIndex);
-
-    console.log('previouscard:', previousCard.id)
-
-
-    if (gameState.deckOfCards[cardID] === gameState.deckOfCards[gameState.openCardIndex]) {
-        updateGuesses();
-        gameState.cardsOpen += 2;
-        if (gameState.cardsOpen === gameState.deckOfCards.length) {
-            gameFinished();
-        }
-        gameState.openCardIndex = null;
-        isRunning = false;
-        return;
-    }
-    updateGuesses();
-
-    gameState.openCardIndex = null;
+    gameState = getGameById(gameState.id);
     setTimeout(() => {
-        clickedCard.classList.toggle("turn");
-        previousCard.classList.toggle("turn");
+        drawCardFaces(gameState.cards, gameState.cardStyle);
         isRunning = false;
     }, 1500)
 
@@ -158,69 +123,47 @@ function updateGuesses() {
     guessSpan.innerText = ++gameState.guesses;
 }
 
-// Game difficulties. How many pairs of pokemon.
-const difficultyLevels = {
-    easy: 10,
-    medium: 20,
-    hard: 30
-}
-
-// Create a deck of pokemon and shuffle pokemon deck
-function newDeck(numberOfPokemons) {
-    const allPokemons = [];
-    for (let i = 1; i < 152; i++) {
-        allPokemons.push(i);
-    }
-    shuffleArray(allPokemons);
-
-    const selectedPokemons = allPokemons.slice(0, numberOfPokemons);
-    const cards = [...selectedPokemons, ...selectedPokemons];
-    shuffleArray(cards);
-    return cards;
-
-}
-
-// Shuffle deck function from StackOverflow
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+// Draw card elements on board
+function drawCardsOnBoard(deckOfCards) {
+    for (let i = 0; i < deckOfCards.length; i++) {
+        board.innerHTML += `
+            <div class="alignmentContainer">
+                <div class="cardcontainer">
+                    <div class="card" id="${i}">
+                    </div>
+                </div>
+            </div>`
     }
 }
-
-// Array of folder names for different pokemon artwork
-// const imageFolder = ['dream-world', 'official-artwork', 'standard'];
-
-// Pick random folder and artwork to use
-// function chooseImageFolder(arrayOfFolders) {
-//     const rand = Math.floor(Math.random() * 3);
-//     return arrayOfFolders[rand];
-// }
 
 // Draw card elements on board
-function drawCardsOnBoard(deckOfCards, deck) {
+function drawCardFaces(deckOfCards, deckArt) {
     let fileExtension = 'png'
-    if (deck === 'dream-world') {
+    if (deckArt === 'dream-world') {
         fileExtension = 'svg'
     }
 
     let i = 0;
-    for (let pokemon of deckOfCards) {
-        const cardTemplate =
-            `<div class="alignmentContainer">
-            <div class="cardcontainer">
-        <div class="card" id="${i}">
-            <div class="front">front of card
-            <img src="pokemon_logo.svg"></div>
-            <div class="back">back of card
-            <img src="./sprites/${deck}/${pokemon}.${fileExtension}"></div>
-        </div>
-    </div>
-    </div>`
-        board.innerHTML += cardTemplate;
+    for (let card of deckOfCards) {
+        let cardEl = document.getElementById(i);
+        if (!card.open) {
+            cardEl.innerHTML = `
+                <div class="front">front of card
+                    <img src="pokemon_logo.svg">
+                </div>`
+        } else {
+            cardEl.innerHTML = `
+                <div class="back">back of card
+                    <img src="./sprites/${deckArt}/${card.pokemonId}.${fileExtension}">
+                </div>`
+        }
         i++;
     }
 }
+
+
+
+
 // Game Clock adapted from MDN setInterval tutorial
 // Define a counter variable for the number of seconds and set it to zero.
 let secondCount = 0;
