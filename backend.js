@@ -17,6 +17,9 @@ const levels = [
     }
 ]
 
+// Create new game object with values user inputs in start menu.
+// Save original game object to gameStorage array in backend. The original object stores all pokemon ids.
+// Pass copy of game object to frontend with pokemon ids set to 0 for cards that are not open.
 function getNewGame(username, level, deckArt) {
     let numOfPairs = 10;
     for (let lvl of levels) {
@@ -44,6 +47,8 @@ function getNewGame(username, level, deckArt) {
     return userViewOfGame(game);
 }
 
+// Make copy of game object and card objects to be passed to frontend
+// Mask pokemon id of cards from user view
 function userViewOfGame(game) {
     const userGame = Object.assign({}, game);
     userGame.cards = userGame.cards.map(card => {
@@ -56,13 +61,20 @@ function userViewOfGame(game) {
     return userGame;
 }
 
+// Get game object of index id from gamestorage array
 function getGameById(id) {
     return userViewOfGame(gameStorage[id]);
 }
 
+// Return requested card object and apply required game logic related flipping the card. Compare cards to see if match.
 function getCard(gameId, cardId) {
     const game = gameStorage[gameId];
     const requestedCard = game.cards[cardId];
+
+    // Check if card already open
+    if (requestedCard.open) {
+        return requestedCard;
+    }
 
     // Open first card
     if (game.openCardId === null) {
@@ -75,6 +87,8 @@ function getCard(gameId, cardId) {
     // Open second card. Compare ID's if match cards remain open. If no match cards are turned back around.
     if (requestedCard.pokemonId === previousCard.pokemonId) {
         requestedCard.open = true;
+        requestedCard.found = true;
+        previousCard.found = true;
         game.pairsFound++;
 
         if (game.pairsFound === game.pairs) {
@@ -91,6 +105,7 @@ function getCard(gameId, cardId) {
     return copyOfRequestedCard;
 }
 
+// Get difficulty level
 function getLevels() {
     return levels;
 }
@@ -101,7 +116,8 @@ function newDeck(numberOfPokemons) {
     for (let i = 1; i < 152; i++) {
         allPokemons.push({
             pokemonId: i,
-            open: false
+            open: false,
+            found: false
         });
     }
     shuffleArray(allPokemons);

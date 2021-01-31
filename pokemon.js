@@ -11,6 +11,8 @@ const startNewGameButton = document.getElementById('newGameButton')
 const restartGame = document.getElementById('restart');
 const endGameButton = document.getElementById('endGameButton');
 const overlay = document.getElementById('overlay');
+const guessSpan = document.getElementById('guesses');
+
 
 // Selector for start menu form label
 const labels = document.querySelectorAll('.form-control label');
@@ -31,7 +33,7 @@ startMenuForm.addEventListener('submit', (evt) => {
 
 // Start new game by clicking start menu button
 startNewGameButton.addEventListener('click', () => {
-    // Select playername and difficulty inputs from start menu form
+    // Select playername, difficulty level and deck artwork inputs from start menu form
     let playerName = startMenuForm.elements.playerName.value;
     let selectedDifficulty = startMenuForm.elements.difficulty.value;
     let deckArt = startMenuForm.elements.deck.value;
@@ -73,14 +75,15 @@ function initGame(username, level, deckArt) {
     navbar.classList.toggle('hide');
     board.classList.toggle('hide');
     gameState = getNewGame(username, level, deckArt);
-    drawCardsOnBoard(gameState.cards);
-    drawCardFaces(gameState.cards, gameState.cardStyle)
+    renderCardsOnBoard(gameState.cards);
+    renderCardFaces(gameState.cards, gameState.cardStyle)
 
     // Enable turning cards around by clicking
     const cards = document.querySelectorAll('.card');
     for (let card of cards) {
         card.addEventListener('click', () => {
             turnCard(card.id);
+            renderGuesses(gameState.guesses);
         });
     }
 }
@@ -91,19 +94,21 @@ let isRunning = false;
 
 // Function to turn cards and check for match
 function turnCard(cardId) {
-    if (isRunning) {
+    if (isRunning || gameState.cards[cardId].open) {
         return;
     }
     isRunning = true;
 
     gameState.cards[cardId] = getCard(gameState.id, cardId);
-    drawCardFaces(gameState.cards, gameState.cardStyle);
+    renderCardFaces(gameState.cards, gameState.cardStyle);
 
     gameState = getGameById(gameState.id);
+    let delay = !gameState.openCardId ? 1500 : 0;
+
     setTimeout(() => {
-        drawCardFaces(gameState.cards, gameState.cardStyle);
+        renderCardFaces(gameState.cards, gameState.cardStyle);
         isRunning = false;
-    }, 1500)
+    }, delay)
 
 }
 
@@ -118,18 +123,22 @@ function gameFinished() {
 }
 
 // Update number of guesses
-function updateGuesses() {
-    let guessSpan = document.getElementById('guesses');
-    guessSpan.innerText = ++gameState.guesses;
+function renderGuesses(numberOfGuesses) {
+    guessSpan.innerText = numberOfGuesses;
 }
 
 // Draw card elements on board
-function drawCardsOnBoard(deckOfCards) {
+function renderCardsOnBoard(deckOfCards) {
     for (let i = 0; i < deckOfCards.length; i++) {
         board.innerHTML += `
             <div class="alignmentContainer">
                 <div class="cardcontainer">
                     <div class="card" id="${i}">
+                        <div class="front">
+                            <img src="pokemon_logo.svg">
+                        </div>
+                        <div class="back">
+                        </div>
                     </div>
                 </div>
             </div>`
@@ -137,7 +146,7 @@ function drawCardsOnBoard(deckOfCards) {
 }
 
 // Draw card elements on board
-function drawCardFaces(deckOfCards, deckArt) {
+function renderCardFaces(deckOfCards, deckArt) {
     let fileExtension = 'png'
     if (deckArt === 'dream-world') {
         fileExtension = 'svg'
@@ -146,16 +155,14 @@ function drawCardFaces(deckOfCards, deckArt) {
     let i = 0;
     for (let card of deckOfCards) {
         let cardEl = document.getElementById(i);
-        if (!card.open) {
-            cardEl.innerHTML = `
-                <div class="front">front of card
-                    <img src="pokemon_logo.svg">
-                </div>`
+        if (card.open) {
+            cardEl.lastElementChild.innerHTML = `<img src="./sprites/${deckArt}/${card.pokemonId}.${fileExtension}">`
+            cardEl.classList.add('turn');
         } else {
-            cardEl.innerHTML = `
-                <div class="back">back of card
-                    <img src="./sprites/${deckArt}/${card.pokemonId}.${fileExtension}">
-                </div>`
+            cardEl.classList.remove('turn');
+            setTimeout(() => {
+                cardEl.lastElementChild.innerHTML = '';
+            }, 500)
         }
         i++;
     }
