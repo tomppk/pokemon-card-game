@@ -68,21 +68,22 @@ function resetGame() {
 let gameState = {};
 
 // Initialize new game.
-function initGame(username, level, deckArt) {
+async function initGame(username, level, deckArt) {
     resetGameTime();
     startGameTime();
     startMenuContainer.classList.toggle('hide');
     navbar.classList.toggle('hide');
     board.classList.toggle('hide');
-    gameState = getNewGame(username, level, deckArt);
+    gameState = await startNewGame(username, level, deckArt);
+    // console.log('gameState obj:', gameState)
     renderCardsOnBoard(gameState.cards);
     renderCardFaces(gameState.cards, gameState.cardStyle)
 
     // Enable turning cards around by clicking
     const cards = document.querySelectorAll('.card');
     for (let card of cards) {
-        card.addEventListener('click', () => {
-            turnCard(card.id);
+        card.addEventListener('click', async () => {
+            await turnCard(card.id);
             renderGuesses(gameState.guesses);
         });
     }
@@ -93,16 +94,16 @@ function initGame(username, level, deckArt) {
 let isRunning = false;
 
 // Function to turn cards and check for match
-function turnCard(cardId) {
+async function turnCard(cardId) {
     if (isRunning || gameState.cards[cardId].open) {
         return;
     }
     isRunning = true;
 
-    gameState.cards[cardId] = getCard(gameState.id, cardId);
+    gameState.cards[cardId] = await getCard(gameState.id, cardId);
     renderCardFaces(gameState.cards, gameState.cardStyle);
 
-    gameState = getGameById(gameState.id);
+    gameState = await getGameById(gameState.id);
     let delay = !gameState.openCardId ? 1500 : 0;
 
     setTimeout(() => {
@@ -162,7 +163,7 @@ function renderCardFaces(deckOfCards, deckArt) {
             cardEl.classList.remove('turn');
             setTimeout(() => {
                 cardEl.lastElementChild.innerHTML = '';
-            }, 500)
+            }, 300)
         }
         i++;
     }

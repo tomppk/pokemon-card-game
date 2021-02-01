@@ -1,3 +1,35 @@
+const path = require('path');
+const express = require('express');
+const app = express();
+
+app.use('/', express.static(path.join(__dirname, 'public')))
+app.use(express.json());
+
+app.post('/api/games', (req, res) => {
+    const { username, level, deckArt } = req.body;
+    console.log(req.body)
+    res.json(getNewGame(username, level, deckArt));
+})
+
+app.post('/api/games/:id', (req, res) => {
+    const { id } = req.body;
+    res.json(getGameById(id));
+})
+
+app.post('/api/games/:id/cards/:cardId', (req, res) => {
+    const { gameId, cardId } = req.body;
+    console.log('gameId:', gameId, 'cardId:', cardId)
+    res.json(getCard(gameId, cardId));
+})
+
+app.get('/api/levels', (req, res) => {
+    res.send('TEST OK!')
+})
+
+app.listen(3000, () => {
+    console.log('Pokemon card game running on port 3000')
+})
+
 // Store game objects
 const gameStorage = [];
 
