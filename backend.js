@@ -4,6 +4,8 @@ const app = express();
 const { v4: uuidv4 } = require('uuid');
 const cookieParser = require('cookie-parser');
 const { type } = require('os');
+
+const { InMemory } = require('./database/InMemory.js');
 // const session = require('express-session');
 
 app.use('/', express.static(path.join(__dirname, 'public')));
@@ -97,8 +99,8 @@ app.listen(3000, () => {
 // Store game session ids
 const sessionStorage = {};
 
-// Store game objects
-const gameStorage = [];
+// Stores game objects
+const gameStorage = new InMemory();
 
 // Game difficulty levels. How many pairs of pokemon.
 const levels = [
@@ -135,8 +137,7 @@ function getNewGame(username, level, deckArt) {
     }
   }
 
-  const game = {
-    id: gameStorage.length,
+  let game = {
     openCardId: null,
     cards: newDeck(numOfPairs),
     guesses: 0,
@@ -149,7 +150,7 @@ function getNewGame(username, level, deckArt) {
     finishedAt: null,
   };
 
-  gameStorage.push(game);
+  game = gameStorage.addGame(game);
 
   return userViewOfGame(game);
 }
@@ -169,13 +170,13 @@ function userViewOfGame(game) {
 }
 
 // Get game object of index id from gamestorage array
-function getGameById(id) {
-  return userViewOfGame(gameStorage[id]);
+function getGameById(gameId) {
+  return userViewOfGame(gameStorage.getGameById(gameId));
 }
 
 // Return requested card object and apply required game logic related flipping the card. Compare cards to see if match.
 function getCard(gameId, cardId) {
-  const game = gameStorage[gameId];
+  const game = gameStorage.getGameById(gameId);
   const requestedCard = game.cards[cardId];
 
   // Check if card already open
@@ -187,6 +188,7 @@ function getCard(gameId, cardId) {
   if (game.openCardId === null) {
     game.openCardId = cardId;
     requestedCard.open = true;
+    gameStorage.updateGame(game);
     return requestedCard;
   }
 
@@ -208,6 +210,8 @@ function getCard(gameId, cardId) {
 
   game.guesses++;
   game.openCardId = null;
+  gameStorage.updateGame(game);
+
   copyOfRequestedCard = Object.assign({}, requestedCard);
   copyOfRequestedCard.open = true;
   return copyOfRequestedCard;
