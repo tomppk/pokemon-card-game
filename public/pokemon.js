@@ -85,6 +85,9 @@ async function initGame(username, level, deckArt) {
         card.addEventListener('click', async () => {
             await turnCard(card.id);
             renderGuesses(gameState.guesses);
+            if (gameState.finished) {
+                gameFinished()
+            }
         });
     }
 }
@@ -117,7 +120,7 @@ async function turnCard(cardId) {
 function gameFinished() {
     stopGameTime();
     overlay.style.display = "block";
-    document.getElementById('endMenuName').innerText = `Congratulations, ${startMenuForm.elements.playerName.value}!`;
+    document.getElementById('endMenuName').innerText = `Congratulations, ${gameState.player}!`;
     document.getElementById('guessParagraph').innerText = `Number of guesses: ${gameState.guesses}`;
     document.getElementById('timeParagraph').innerText = `Time it took to finish: ${displayClock.textContent}`;
     document.getElementById('endMenu').classList.toggle('hide');
@@ -160,10 +163,13 @@ function renderCardFaces(deckOfCards, deckArt) {
             cardEl.lastElementChild.innerHTML = `<img src="./sprites/${deckArt}/${card.pokemonId}.${fileExtension}">`
             cardEl.classList.add('turn');
         } else {
-            cardEl.classList.remove('turn');
-            setTimeout(() => {
-                cardEl.lastElementChild.innerHTML = '';
-            }, 300)
+            if (cardEl.classList.contains('turn')) {
+                cardEl.classList.remove('turn');
+                setTimeout(() => {
+                    cardEl.lastElementChild.innerHTML = '';
+                }, 300)
+            }
+
         }
         i++;
     }

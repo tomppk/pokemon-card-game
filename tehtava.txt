@@ -1,0 +1,28 @@
+Entities:
+- Pokemon = numero; // array, index
+- Card = mitä pokemonia edustaa, tila: kummin päin.
+- Board = Cards joilla paikka
+- Game = Board, tila: mitkä kortit arvottu, mitkä pareja
+
+1. Korttipakan generointi. Montako paria halutaan.
+    - Numero = pokemon
+    - Pakan koko. Ei hardcodata logiikkaan const deckSize = 20. Käyttäjä antaa
+    - funktioina
+
+2. Pakan sekoitus
+    - array numerot sekoittaa
+    - 
+
+3. Korttien piirtäminen pöytään
+    - HTML
+
+4. Navbar
+    - Arvausten laskenta
+    - Restart Game
+
+5. Uuden pelin aloitus
+    - Vaikeusasteen valinta
+
+6. Pelin lopetus
+    - Pisteiden näyttö
+    - Mahdollisuus aloittaa uusi peli
