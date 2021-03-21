@@ -72,6 +72,7 @@ app.post('/api/games', (req, res) => {
   const game = getNewGame(username, level, deckArt);
   const sessionId = newSession(game.id);
   res.cookie('sessionId', sessionId);
+  res.cookie('gameId', game.id);
   res.json(game);
 });
 
@@ -145,6 +146,7 @@ function getNewGame(username, level, deckArt) {
     player: username,
     cardStyle: deckArt,
     finished: false,
+    finishedAt: null,
   };
 
   gameStorage.push(game);
@@ -198,6 +200,7 @@ function getCard(gameId, cardId) {
 
     if (game.pairsFound === game.pairs) {
       game.finished = true;
+      game.finishedAt = Date.now();
     }
   } else {
     previousCard.open = false;
