@@ -8,14 +8,15 @@ let gameState = {};
 // Load existing game session from cookie if there is one
 async function loadExistingGame() {
   try {
-    const gameId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('gameId='))
-      .split('=')[1];
-    console.log(typeof gameId);
+    if (document.cookie) {
+      const gameId = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('gameId='))
+        .split('=')[1];
 
-    gameState = await getGameById(gameId);
-    initGame(gameState);
+      gameState = await getGameById(gameId);
+      initGame(gameState);
+    }
   } catch {
     return;
   }
@@ -87,7 +88,7 @@ function resetGame() {
 }
 
 // Initialize new game.
-async function initGame(gameState) {
+function initGame(gameState) {
   startGameTime(gameState.startedAt);
   renderGuesses(gameState.guesses);
   startMenuContainer.classList.toggle('hide');
@@ -100,8 +101,8 @@ async function initGame(gameState) {
   // Enable turning cards around by clicking
   const cards = document.querySelectorAll('.card');
   for (let card of cards) {
-    card.addEventListener('click', async () => {
-      await turnCard(card.id);
+    card.addEventListener('click', () => {
+      turnCard(card.id);
     });
   }
 }

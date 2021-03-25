@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 const cookieParser = require('cookie-parser');
 const { type } = require('os');
 
-const { InMemory } = require('./database/InMemory.js');
+const { InMemory, MongoDatabase } = require('./database/');
 // const session = require('express-session');
 
 app.use('/', express.static(path.join(__dirname, 'public')));
@@ -22,17 +22,9 @@ app.use(cookieParser());
 
 // Middleware to check if user is authorized to access specific game session
 const gameAuth = (req, res, next) => {
-  const gameId = parseInt(req.params.gameId);
-  const { sessionId } = req.cookies;
+  const gameId = req.params.gameId;
 
-  if (isNaN(gameId)) {
-    res.status(400);
-    res.json({
-      error: 'GameId has to be a number',
-      details: `Expected gameId to be a number but got: ${req.params.gameId}`,
-    });
-    return;
-  }
+  const { sessionId } = req.cookies;
 
   if (!sessionId) {
     res.status(401);
@@ -70,7 +62,6 @@ const isDefined = (value) => {
 
 app.post('/api/games', (req, res) => {
   const { username, level, deckArt } = req.body;
-  console.log(req.body);
   const game = getNewGame(username, level, deckArt);
   const sessionId = newSession(game.id);
   res.cookie('sessionId', sessionId);
@@ -78,14 +69,14 @@ app.post('/api/games', (req, res) => {
   res.json(game);
 });
 
-app.get('/api/games/:gameId', gameAuth, (req, res) => {
+app.get('/api/games/:gameId', gameAuth, async (req, res) => {
   const { gameId } = req.params;
-  res.json(getGameById(gameId));
+  res.json(await getGame(gameId));
 });
 
-app.get('/api/games/:gameId/cards/:cardId', gameAuth, (req, res) => {
+app.get('/api/games/:gameId/cards/:cardId', gameAuth, async (req, res) => {
   const { gameId, cardId } = req.params;
-  res.json(getCard(gameId, cardId));
+  res.json(await getCard(gameId, cardId));
 });
 
 app.get('/api/levels', (req, res) => {
@@ -101,6 +92,7 @@ const sessionStorage = {};
 
 // Stores game objects
 const gameStorage = new InMemory();
+const mongoStorage = new MongoDatabase();
 
 // Game difficulty levels. How many pairs of pokemon.
 const levels = [
@@ -149,8 +141,9 @@ function getNewGame(username, level, deckArt) {
     finished: false,
     finishedAt: null,
   };
-
-  game = gameStorage.addGame(game);
+  // console.log('inside getnewgame', game);
+  // game = gameStorage.addGame(game);
+  game = mongoStorage.addGame(game);
 
   return userViewOfGame(game);
 }
@@ -170,13 +163,14 @@ function userViewOfGame(game) {
 }
 
 // Get game object of index id from gamestorage array
-function getGameById(gameId) {
-  return userViewOfGame(gameStorage.getGameById(gameId));
+async function getGame(gameId) {
+  const game = await mongoStorage.getGameById(gameId);
+  return userViewOfGame(game);
 }
 
 // Return requested card object and apply required game logic related flipping the card. Compare cards to see if match.
-function getCard(gameId, cardId) {
-  const game = gameStorage.getGameById(gameId);
+async function getCard(gameId, cardId) {
+  const game = await mongoStorage.getGameById(gameId);
   const requestedCard = game.cards[cardId];
 
   // Check if card already open
@@ -188,7 +182,7 @@ function getCard(gameId, cardId) {
   if (game.openCardId === null) {
     game.openCardId = cardId;
     requestedCard.open = true;
-    gameStorage.updateGame(game);
+    await mongoStorage.updateGame(game);
     return requestedCard;
   }
 
@@ -210,7 +204,7 @@ function getCard(gameId, cardId) {
 
   game.guesses++;
   game.openCardId = null;
-  gameStorage.updateGame(game);
+  await mongoStorage.updateGame(game);
 
   copyOfRequestedCard = Object.assign({}, requestedCard);
   copyOfRequestedCard.open = true;
