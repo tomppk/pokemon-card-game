@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const { type } = require('os');
 
 const { InMemory, MongoDatabase } = require('./database/');
+const { mongo } = require('mongoose');
 // const session = require('express-session');
 
 app.use('/', express.static(path.join(__dirname, 'public')));
@@ -21,7 +22,7 @@ app.use(cookieParser());
 // }))
 
 // Middleware to check if user is authorized to access specific game session
-const gameAuth = (req, res, next) => {
+const gameAuth = async (req, res, next) => {
   const gameId = req.params.gameId;
 
   const { sessionId } = req.cookies;
@@ -32,7 +33,8 @@ const gameAuth = (req, res, next) => {
     return;
   }
 
-  if (!hasGameAccess(sessionId, gameId)) {
+  const access = await hasGameAccess(sessionId, gameId);
+  if (!access) {
     res.status(403);
     res.json({
       error: 'Access to game forbidden',
@@ -44,11 +46,12 @@ const gameAuth = (req, res, next) => {
 };
 
 // Check that no value is undefined and that there is match in our session storage
-const hasGameAccess = (sessionId, gameId) => {
+const hasGameAccess = async (sessionId, gameId) => {
   return (
     isDefined(sessionId) &&
     isDefined(gameId) &&
-    sessionStorage[sessionId] === gameId
+    (await mongoStorage.getSessionById(sessionId)) === gameId
+    // sessionStorage[sessionId] === gameId
   );
 };
 
@@ -88,10 +91,10 @@ app.listen(3000, () => {
 });
 
 // Store game session ids
-const sessionStorage = {};
+// const sessionStorage = {};
 
-// Stores game objects
-const gameStorage = new InMemory();
+// Stores game objects and Mongo also stores sessions
+// const gameStorage = new InMemory();
 const mongoStorage = new MongoDatabase();
 
 // Game difficulty levels. How many pairs of pokemon.
@@ -113,7 +116,8 @@ const levels = [
 // Create unique id for session. Save session id and game id as key: value pairs in session storage
 function newSession(gameId) {
   const sessionId = uuidv4();
-  sessionStorage[sessionId] = gameId;
+  mongoStorage.addSession(sessionId, gameId);
+  // sessionStorage[sessionId] = gameId;
   return sessionId;
 }
 
