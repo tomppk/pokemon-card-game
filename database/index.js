@@ -1,6 +1,7 @@
 const deepcopy = require('deepcopy');
 const mongoose = require('mongoose');
 const Game = require('./models/game');
+const Session = require('./models/session');
 
 // In memory database. Stores game objects in an array
 class InMemory {
@@ -83,6 +84,30 @@ class MongoDatabase {
       return updatedGame;
     } catch (err) {
       return console.log('Error could not update game in database', err);
+    }
+  }
+
+  // Add new Session to database. Add gameId to session
+  addSession(sessionId, gameId) {
+    try {
+      const session = new Session({ _id: sessionId, gameId: gameId });
+      session.save((err) => {
+        if (err) {
+          return console.log('Error while saving session to database', err);
+        }
+      });
+    } catch (err) {
+      return console.log('Error could not savesession to database', err);
+    }
+  }
+
+  // Find session from database and return a promise with gameId
+  async getSessionById(sessionId) {
+    try {
+      let session = await Session.findById(sessionId);
+      return session.gameId;
+    } catch (err) {
+      return console.log('Error could not retrieve session from database', err);
     }
   }
 }

@@ -9,6 +9,6 @@ const sessionSchema = new Schema(
   { _id: false }
 );
 
-const Session = mongoose.Model('Session', sessionSchema);
+const Session = mongoose.model('Session', sessionSchema);
 
 module.exports = Session;
