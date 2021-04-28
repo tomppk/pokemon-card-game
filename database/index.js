@@ -2,6 +2,7 @@ const deepcopy = require('deepcopy');
 const mongoose = require('mongoose');
 const Game = require('./models/game');
 const Session = require('./models/session');
+const Highscore = require('./models/highscore');
 
 // In memory database. Stores game objects in an array
 class InMemory {
