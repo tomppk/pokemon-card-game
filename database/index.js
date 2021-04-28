@@ -112,19 +112,77 @@ class MongoDatabase {
     }
   }
 
-  // Add new Highscore to database.
-  addHighscore(gameId, player, guesses, gametime) {
+  // Save new Highscore to database.
+  async addHighscore(player, guesses, gametime) {
     try {
       const highscore = new Highscore({
-        _id: gameId,
         player: player,
         guesses: guesses,
         gametime: gametime,
+      });
+      await highscore.save((err) => {
+        if (err) {
+          return console.log('Error while saving highscore to database', err);
+        }
       });
     } catch (err) {
       return console.log('Error could not save highscore to database', err);
     }
   }
+
+  // Find highscores, sort them, and return top 10
+  // Aggregates all highscores together into an array
+  // sorts them in ascending order ie. small to big
+  // First sort according to least amount of guesses. If amount of guesses
+  // are same for two players, then sort according to gametime who was faster.
+  // limits the array items to 10
+  async getHighscore() {
+    try {
+      let highscores = await Highscore.aggregate([
+        { $sort: { guesses: 1, gametime: 1 } },
+        { $limit: 10 },
+      ]);
+      console.log(highscores);
+      return highscores;
+    } catch (err) {
+      return console.log(
+        'Error could not retrieve highscores from database',
+        err
+      );
+    }
+  }
 }
 
 module.exports = { InMemory, MongoDatabase };
+
+// RETURNED ARRAY OF HIGHSCORES
+// [
+//   {
+//     _id: 608989a060c9c24700dac6c7,
+//     player: 'master',
+//     guesses: 14,
+//     gametime: 53757,
+//     __v: 0
+//   },
+//   {
+//     _id: 60898c1a4a971f49510279b6,
+//     player: 'johson',
+//     guesses: 15,
+//     gametime: 57041,
+//     __v: 0
+//   },
+//   {
+//     _id: 608987f496c69745be60193a,
+//     player: 'tom',
+//     guesses: 16,
+//     gametime: 1619625972111,
+//     __v: 0
+//   },
+//   {
+//     _id: 608988bd96c69745be60193c,
+//     player: 'newgamer',
+//     guesses: 23,
+//     gametime: 1619626173524,
+//     __v: 0
+//   }
+// ]

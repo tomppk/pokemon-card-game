@@ -201,6 +201,11 @@ async function getCard(gameId, cardId) {
     if (game.pairsFound === game.pairs) {
       game.finished = true;
       game.finishedAt = Date.now();
+      // Total gametime in ms
+      const totalGameTime = game.finishedAt - game.startedAt;
+      // Save highscore to db and retrieve highscores
+      mongoStorage.addHighscore(game.player, game.guesses, totalGameTime);
+      mongoStorage.getHighscore();
     }
   } else {
     previousCard.open = false;
