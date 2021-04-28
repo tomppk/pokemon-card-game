@@ -20,7 +20,7 @@ async function startNewGame(username, level, deckArt) {
     const data = await res.json();
     return data;
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error api.js startNewGame POST: /api/games', error);
   }
 }
 
@@ -36,7 +36,7 @@ async function getGameById(id) {
     const data = await res.json();
     return data;
   } catch (error) {
-    console.error('Error: ', error);
+    console.error('Error api.js getGameById GET: /api/games/:id ', error);
   }
 }
 
@@ -52,10 +52,25 @@ async function getCard(gameId, cardId) {
     const data = await res.json();
     return data;
   } catch (error) {
-    console.error('Error:', error);
+    console.error(
+      'Error api.js getCard GET: /api/games/:gameId/cards/:cardId',
+      error
+    );
   }
 }
 
-// Get difficulty levels that are possible to choose
-// function getLevels() {
-// }
+// Return requested high scores in JSON format
+async function getHighScores() {
+  try {
+    const res = await fetch('/api/highscores', {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error('Error api.js getHighScores GET: /api/highscores', error);
+  }
+}

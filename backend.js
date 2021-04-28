@@ -82,8 +82,9 @@ app.get('/api/games/:gameId/cards/:cardId', gameAuth, async (req, res) => {
   res.json(await getCard(gameId, cardId));
 });
 
-app.get('/api/levels', (req, res) => {
-  res.send('TEST OK!');
+app.get('/api/highscores', async (req, res) => {
+  const highscores = await mongoStorage.getHighscore();
+  res.json(highscores);
 });
 
 app.listen(3000, () => {
@@ -205,7 +206,6 @@ async function getCard(gameId, cardId) {
       const totalGameTime = game.finishedAt - game.startedAt;
       // Save highscore to db and retrieve highscores
       mongoStorage.addHighscore(game.player, game.guesses, totalGameTime);
-      mongoStorage.getHighscore();
     }
   } else {
     previousCard.open = false;

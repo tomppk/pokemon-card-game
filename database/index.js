@@ -170,19 +170,5 @@ module.exports = { InMemory, MongoDatabase };
 //     guesses: 15,
 //     gametime: 57041,
 //     __v: 0
-//   },
-//   {
-//     _id: 608987f496c69745be60193a,
-//     player: 'tom',
-//     guesses: 16,
-//     gametime: 1619625972111,
-//     __v: 0
-//   },
-//   {
-//     _id: 608988bd96c69745be60193c,
-//     player: 'newgamer',
-//     guesses: 23,
-//     gametime: 1619626173524,
-//     __v: 0
 //   }
 // ]

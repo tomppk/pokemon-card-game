@@ -148,7 +148,45 @@ function gameFinished() {
   document.getElementById(
     'timeParagraph'
   ).innerText = `Time it took to finish: ${displayClock.textContent}`;
+  renderHighScores();
   document.getElementById('endMenu').classList.toggle('hide');
+}
+
+// Render high scores list in end menu
+async function renderHighScores() {
+  const highScoresList = document.getElementById('highScoresList');
+  const highscores = await getHighScores();
+
+  // Highscores returned in JSON
+  // Map over scores and create list elements. gameTime in ms calculate it to show min and sec.
+  // Join array elements together with '' to replace default comma
+  highScoresList.innerHTML = highscores
+    .map((score) => {
+      elapsedSeconds = Math.round(score.gametime / 1000);
+      elapsedGameTime = renderHighScoresTime(elapsedSeconds);
+
+      return `<li class="high-score">${score.player} - ${score.guesses} guesses in ${elapsedGameTime}</li>`;
+    })
+    .join('');
+}
+
+// Function modified from renderTimer just to return string of elapsed gametime
+function renderHighScoresTime(secondCount) {
+  // Calculate current hours, minutes, and seconds
+  let hours = Math.floor(secondCount / 3600);
+  let minutes = Math.floor((secondCount % 3600) / 60);
+  let seconds = Math.floor(secondCount % 60);
+
+  // Display a leading zero if the values are less than ten
+  let displayHours = hours < 10 ? '0' + hours : hours;
+  let displayMinutes = minutes < 10 ? '0' + minutes : minutes;
+  let displaySeconds = seconds < 10 ? '0' + seconds : seconds;
+
+  // Write the current stopwatch display time into the display paragraph
+  const elapsedTime =
+    displayHours + ':' + displayMinutes + ':' + displaySeconds;
+
+  return elapsedTime;
 }
 
 // Update number of guesses
