@@ -6,7 +6,7 @@ const highscoreSchema = new Schema(
     _id: String,
     player: String,
     guesses: Number,
-    gameTime: Number,
+    gametime: Number,
   },
   { _id: false }
 );

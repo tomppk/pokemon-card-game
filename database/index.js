@@ -98,7 +98,7 @@ class MongoDatabase {
         }
       });
     } catch (err) {
-      return console.log('Error could not savesession to database', err);
+      return console.log('Error could not save session to database', err);
     }
   }
 
@@ -109,6 +109,20 @@ class MongoDatabase {
       return session.gameId;
     } catch (err) {
       return console.log('Error could not retrieve session from database', err);
+    }
+  }
+
+  // Add new Highscore to database.
+  addHighscore(gameId, player, guesses, gametime) {
+    try {
+      const highscore = new Highscore({
+        _id: gameId,
+        player: player,
+        guesses: guesses,
+        gametime: gametime,
+      });
+    } catch (err) {
+      return console.log('Error could not save highscore to database', err);
     }
   }
 }
