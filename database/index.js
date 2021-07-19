@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const Game = require('./models/game');
 const Session = require('./models/session');
 const Highscore = require('./models/highscore');
+const InputError = require('./models/InputError');
+const dbUrl = process.env.DB_URL;
 
 // In memory database. Stores game objects in an array
 class InMemory {
@@ -46,21 +48,20 @@ class MongoDatabase {
   }
 
   // Add new Game object into database. Add id to game
-  addGame(game) {
-    try {
-      const copyOfGame = new Game(game);
-      game['id'] = copyOfGame._id.toString();
+  async addGame(game) {
+    const copyOfGame = new Game(game);
+    game['id'] = copyOfGame._id.toString();
 
-      copyOfGame.save((err) => {
-        if (err) {
-          return console.log('Error while saving to database', err);
-        }
-      });
-
-      return game;
-    } catch (err) {
-      return console.log('Error while saving to database', err);
-    }
+    await copyOfGame.save().catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        console.error('Error while saving to database', err);
+        throw new InputError(err.message);
+      } else {
+        console.error('Error while saving to database', err);
+        throw err;
+      }
+    });
+    return game;
   }
 
   // Find game from database and return it as Javascript object

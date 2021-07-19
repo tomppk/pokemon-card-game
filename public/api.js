@@ -2,26 +2,25 @@
 // Save original game object to gameStorage array in backend. The original object stores all pokemon ids.
 // Pass copy of game object to frontend with pokemon ids set to 0 for cards that are not open.
 async function startNewGame(username, level, deckArt) {
-  try {
-    const gameParameters = {
-      username: username,
-      level: level,
-      deckArt: deckArt,
-    };
+  const gameParameters = {
+    username: username,
+    level: level,
+    deckArt: deckArt,
+  };
 
-    const res = await fetch('/api/games', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(gameParameters),
-    });
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    console.error('Error api.js startNewGame POST: /api/games', error);
+  const res = await fetch('/api/games', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(gameParameters),
+  });
+  const data = await res.json();
+  if (res.status !== 200) {
+    throw new Error(data.error);
   }
+  return data;
 }
 
 // Get game object of index id from game storage array
