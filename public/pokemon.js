@@ -57,11 +57,20 @@ startMenuForm.addEventListener('submit', (evt) => {
 // Start new game by clicking start menu button
 startNewGameButton.addEventListener('click', async () => {
   // Select playername, difficulty level and deck artwork inputs from start menu form
-  let username = startMenuForm.elements.playerName.value;
-  let level = startMenuForm.elements.difficulty.value;
-  let deckArt = startMenuForm.elements.deck.value;
-  gameState = await startNewGame(username, level, deckArt);
-  initGame(gameState);
+  // Validate form inputs before submitting form and making network requests ie. that playername is not empty
+  const isValid = document.querySelector('#startMenuForm').reportValidity();
+  if (!isValid) {
+    return;
+  }
+  try {
+    let username = startMenuForm.elements.playerName.value;
+    let level = startMenuForm.elements.difficulty.value;
+    let deckArt = startMenuForm.elements.deck.value;
+    gameState = await startNewGame(username, level, deckArt);
+    initGame(gameState);
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 // Restart game
