@@ -7,19 +7,12 @@ const { type } = require('os');
 
 const { InMemory, MongoDatabase } = require('./database/');
 const { mongo } = require('mongoose');
+const InputError = require('./database/models/InputError');
 // const session = require('express-session');
 
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(cookieParser());
-// app.use(session({
-//     genid: function (req) {
-//         return genuuid()
-//     },
-//     secret: 'pokemonsecret',
-//     saveUninitialized: false,
-//     resave: false
-// }))
 
 // Middleware to check if user is authorized to access specific game session
 const gameAuth = async (req, res, next) => {
@@ -63,13 +56,17 @@ const isDefined = (value) => {
   return true;
 };
 
-app.post('/api/games', (req, res) => {
+app.post('/api/games', async (req, res, next) => {
   const { username, level, deckArt } = req.body;
-  const game = getNewGame(username, level, deckArt);
-  const sessionId = newSession(game.id);
-  res.cookie('sessionId', sessionId);
-  res.cookie('gameId', game.id);
-  res.json(game);
+  try {
+    const game = await getNewGame(username, level, deckArt);
+    const sessionId = newSession(game.id);
+    res.cookie('sessionId', sessionId);
+    res.cookie('gameId', game.id);
+    res.json(game);
+  } catch (err) {
+    next(err);
+  }
 });
 
 app.get('/api/games/:gameId', gameAuth, async (req, res) => {
@@ -90,6 +87,22 @@ app.get('/api/highscores', async (req, res) => {
 app.listen(3000, () => {
   console.log('Pokemon card game running on port 3000');
 });
+
+// Global middleware to catch errors for all routes
+const errorHandler = function (err, req, res, next) {
+  if (err instanceof InputError) {
+    console.error(req.path, req.method, err);
+    res.status(400);
+    res.json({ error: err.userMessage });
+  } else {
+    console.error(req.path, req.method, err);
+    res.status(500);
+    res.json({ error: 'Internal server error' });
+  }
+};
+
+// Use middleware to check for errors for all requests
+app.use(errorHandler);
 
 // Store game session ids
 // const sessionStorage = {};
@@ -125,7 +138,7 @@ function newSession(gameId) {
 // Create new game object with values user inputs in start menu.
 // Save original game object to gameStorage array in backend. The original object stores all pokemon ids.
 // Pass copy of game object to frontend with pokemon ids set to 0 for cards that are not open.
-function getNewGame(username, level, deckArt) {
+async function getNewGame(username, level, deckArt) {
   let numOfPairs = 10;
   for (let lvl of levels) {
     if (lvl.name === level) {
@@ -148,7 +161,7 @@ function getNewGame(username, level, deckArt) {
   };
   // console.log('inside getnewgame', game);
   // game = gameStorage.addGame(game);
-  game = mongoStorage.addGame(game);
+  game = await mongoStorage.addGame(game);
 
   return userViewOfGame(game);
 }

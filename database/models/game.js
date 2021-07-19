@@ -11,7 +11,7 @@ const gameSchema = new Schema({
   pairs: Number,
   pairsFound: Number,
   startedAt: Number,
-  player: String,
+  player: { type: String, required: true },
   cardStyle: String,
   finished: Boolean,
   finishedAt: {
