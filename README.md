@@ -1,27 +1,17 @@
-# pokemon-card-game
-Pokemon memory card game
+# Pokemon memory card game
+Personal full-stack project to showcase web-development skills and having fun at the same time.
 
-**Link to project page:**
-https://tomppk.github.io/pokemon-card-game/
+Pokemon memory card game is a web app hosted on Heroku. Enter your name, select difficulty and artwork and have a go at it. Try to find all the pairs with as few guesses as possible and as quickly as you can. See if you can make it to the highscores list!
 
+**Try it out:**
+[Play the game](https://pokemon-memory-card-game.herokuapp.com/)
 
-### To do:
-
-**CSS**
-* Add Pokemon img to card backside
-* Visually style cards and board
-
-**JS**
-* Recognize when two cards match (have the same img)
-* Hide/delete matched cards
-* Limit turning of cards to only two at a time
-* Randomly assign images to card backsides
-* Count guesses how many it took to find all matches
-* Start new game
-
-**Later**
-* Menu/options
-* Select difficulty (different number of cards on board)
-* Select card front img/style (Pokemon logo, Pokeball etc.)
-* Highscores (top 5-10 scores with names)
- 
+### Web technologies used:
+* HTML5
+* CSS
+* Javascript
+* Node.js
+* Express
+* Mongoose
+* MongoDB Atlas
+* Heroku
