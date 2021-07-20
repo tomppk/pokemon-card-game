@@ -1,3 +1,4 @@
+require('dotenv').config();
 const deepcopy = require('deepcopy');
 const mongoose = require('mongoose');
 const Game = require('./models/game');
@@ -33,8 +34,9 @@ class InMemory {
 // External database. Stores game objects inside MongoDB
 class MongoDatabase {
   // Set up connection to database
+  // 'mongodb://localhost:27017/pokemon'
   constructor() {
-    mongoose.connect('mongodb://localhost:27017/pokemon', {
+    mongoose.connect(dbUrl, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: false,

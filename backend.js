@@ -84,8 +84,9 @@ app.get('/api/highscores', async (req, res) => {
   res.json(highscores);
 });
 
-app.listen(3000, () => {
-  console.log('Pokemon card game running on port 3000');
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Pokemon card game running on port ${port}`);
 });
 
 // Global middleware to catch errors for all routes
